@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import argparse
 import requests
 from pprint import pprint
+from re import findall
 
 load_dotenv()
 parser = argparse.ArgumentParser(
@@ -65,15 +66,20 @@ def get_user_watch_history(username: str):
         return dict()
 
 
+def massage_export_data(watch_history: dict):
+    watch_history['total_watch_time'] = watch_history.pop("total_duration")
+    return watch_history
+
+
 def export_to_html(watch_history: dict):
     # Read in the file
     with open("template.html", "r") as file:
         filedata = file.read()
 
     # Replace strings
-    filedata = filedata.replace(
-        "{% total_watch_time %}", watch_history["total_duration"]
-    )
+    replacements = findall(r"({% ([\w\_]+) %})", filedata)
+    for point in replacements:
+        filedata = filedata.replace(point[0], watch_history[point[1]])
 
     # Write the file out again
     with open("output.html", "w") as file:
@@ -82,5 +88,5 @@ def export_to_html(watch_history: dict):
 
 if __name__ == "__main__":
     args = parser.parse_args()
-    user_data = get_user_watch_history("Dude036")
-    export_to_html(user_data)
+    user_data = get_user_watch_history(args.user)
+    export_to_html(massage_export_data(user_data))
