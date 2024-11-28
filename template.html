@@ -1,7 +1,86 @@
 <html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" ontent="width=device-width, initial-scale=1">
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+</head>
 <body>
-<p>
-    Total Watch Time: {% total_watch_time %}
-</p>
+<nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
+	<div class="container-fluid">
+		<span class="navbar-brand" href="#">
+				<svg xmlns="http://www.w3.org/2000/svg" height="60" width="60" viewBox="0, 0, 512, 512">
+					<rect width="512" height="512" rx="15%" fill="#282a2d"/>
+					<path d="M256 70 H148 l108 186-108 186h108l108-186z" fill="#e5a00d"/>
+				</svg>
+		</span>
+		<button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+			<span class="navbar-toggler-icon"></span>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			<ul class="navbar-nav me-auto mb-2 mb-lg-0">
+				<li class="nav-item">
+					<a class="nav-link" href="#server-stats">Server's Statistics</a>
+				</li>
+				<li class="nav-item">
+					<a class="nav-link" href="#user-stats">{% user_name %}'s Statistics</a>
+				</li>
+			</ul>
+		</div>
+	</div>
+</nav>
+
+<div class="container my-5">
+	<h1>Your Plex Experience in 2024</h1>
+	<div class="col-lg-10 px-0">
+		<p class="fs-5">
+			Firstly, I wanted to express my deepest gratitude for utilizing my Plex server.
+			I've spent countless hours searching, retrieving, and organizing the media on this server.
+			It makes my heart proud that I get to share all of this effort with you.
+		</p>
+
+		<p class="fs-4">Without further ado, here are this years statistics!</p>
+		<hr class="col-1 my-4">
+
+	</div>
+	<div class="col-lg-8 px-0">
+		<h2 id="server-stats">Server Wide Statistics</h2>
+		<table class="table table-striped">
+			<tbody>
+			<tr>
+				<th scope="row">Total Storage Size</th>
+				<td>80 TB</td>
+			</tr>
+			<tr>
+				<th scope="row">Storage Capacity Added this year</th>
+				<td>32 TB</td>
+			</tr>
+			<tr>
+				<th scope="row">TV Shows added this year</th>
+				<td>{% all_tv_added %}</td>
+			</tr>
+			<tr>
+				<th scope="row">Movies added this year</th>
+				<td>{% all_movies_added %}</td>
+			</tr>
+			<tr>
+				<th scope="row">Music added this year</th>
+				<td>{% all_music_added %}</td>
+			</tr>
+			</tbody>
+		</table>
+
+
+		<div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
+			<div class="progress-bar bg-success" style="width: 25%"></div>
+		</div>
+
+
+		<hr class="col-1 my-4">
+	</div>
+	<div class="col-lg-8 px-0">
+		<h2 id="user-stats">{% user_name %} Statistics</h2>
+	</div>
+</div>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

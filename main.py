@@ -1,10 +1,10 @@
-import simplejson as json
 import os
 from dotenv import load_dotenv
 import argparse
 import requests
-from pprint import pprint
 from re import findall
+from statistics import add_all_stats
+from datetime import datetime
 
 load_dotenv()
 parser = argparse.ArgumentParser(
@@ -19,8 +19,13 @@ parser.add_argument(
     help="Enables verbose logging of program running",
 )
 parser.add_argument(
-    "-u", "--user", help="A string of the username you are inquiring about"
+    "-u", "--user", required=True, help="A string of the username you are inquiring about"
 )
+
+parser.add_argument(
+    "-y", "--year", required=True, help="The calender year to extract data from"
+)
+args = parser.parse_args()
 
 
 def request_parser(params: dict):
@@ -29,14 +34,36 @@ def request_parser(params: dict):
     return requests.request("GET", url, params=params)
 
 
-def get_user_watch_history(username: str):
+def get_recently_added_tv():
+    # Setup batch retrieval
+    start = 0
+    recent = set()
+    while True:
+        response = request_parser(
+            {
+                "cmd": "get_recently_added",
+                "count": "10",
+                "start": str(start),
+                "media_type": 'episode',
+            }
+        )
+        if response.status_code == 200:
+            data = response.json()["response"]['recently_added']
+            for added in data:
+                date = datetime.fromtimestamp(added['added_at'])
+                if date.year == args.year:
+                    recent.add(added['grandparent_title'] + ' Season ' + added['parent_media_index'])
+
+
+
+
+def get_general_watch_history():
     # Get quantity of entries to parse
     response = request_parser(
         {
             "cmd": "get_history",
-            "user": username,
-            "before": "2024-12-31",
-            "after ": "2024-01-01",
+            "before": args.year + "-12-31",
+            "after ": args.year + "-01-01",
             "order_column": "date",
             "order_dir": "desc",
             "start": 0,
@@ -51,9 +78,8 @@ def get_user_watch_history(username: str):
     batch = request_parser(
         {
             "cmd": "get_history",
-            "user": username,
-            "before": "2024-12-31",
-            "after ": "2024-01-01",
+            "before": args.year + "-12-31",
+            "after ": args.year + "-01-01",
             "order_column": "date",
             "order_dir": "desc",
             "start": 0,
@@ -66,9 +92,41 @@ def get_user_watch_history(username: str):
         return dict()
 
 
-def massage_export_data(watch_history: dict):
-    watch_history['total_watch_time'] = watch_history.pop("total_duration")
-    return watch_history
+def get_user_watch_history():
+    # Get quantity of entries to parse
+    response = request_parser(
+        {
+            "cmd": "get_history",
+            "user": args.user,
+            "before": args.year + "-12-31",
+            "after ": args.year + "-01-01",
+            "order_column": "date",
+            "order_dir": "desc",
+            "start": 0,
+            "length": 1,
+        }
+    )
+    total_length = 0
+    if response.status_code == 200:
+        data = response.json()["response"]["data"]
+        total_length = data["recordsFiltered"]
+
+    batch = request_parser(
+        {
+            "cmd": "get_history",
+            "user": args.user,
+            "before": args.year + "-12-31",
+            "after ": args.year + "-01-01",
+            "order_column": "date",
+            "order_dir": "desc",
+            "start": 0,
+            "length": total_length,
+        }
+    )
+    if batch.status_code == 200:
+        return batch.json()["response"]["data"]
+    else:
+        return dict()
 
 
 def export_to_html(watch_history: dict):
@@ -77,8 +135,10 @@ def export_to_html(watch_history: dict):
         filedata = file.read()
 
     # Replace strings
-    replacements = findall(r"({% ([\w\_]+) %})", filedata)
+    replacements = findall(r"({% ([\w_]+) %})", filedata)
     for point in replacements:
+        if args.verbose:
+            print("Replacing " + point[0])
         filedata = filedata.replace(point[0], watch_history[point[1]])
 
     # Write the file out again
@@ -87,6 +147,14 @@ def export_to_html(watch_history: dict):
 
 
 if __name__ == "__main__":
-    args = parser.parse_args()
-    user_data = get_user_watch_history(args.user)
-    export_to_html(massage_export_data(user_data))
+    # Process all user data
+    general_data = {'user_name': args.user}
+    all_data = get_general_watch_history()
+    general_data.update(add_all_stats(all_data, 'all_'))
+
+    # Process specific user data
+    user_data = get_user_watch_history()
+
+    # Export
+
+    export_to_html(general_data)
