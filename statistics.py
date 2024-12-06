@@ -1,77 +1,270 @@
-def add_stat(d: dict, k: str, v):
-    d[k] = v
-    return d
+from network import *
+from datetime import datetime
 
 
-def add_all_stats(history: dict, prefix: str = ''):
+def prettify_time(time: int):
+    date = datetime.fromtimestamp(time)
+    origin = datetime.fromisoformat("1970-01-01T00:00:00")
+    td = date - origin
+    return (
+        str(td.days)
+        + " days "
+        + str(td.seconds // 60 // 60)
+        + " hrs "
+        + str(td.seconds // 60)
+        + " mins"
+    )
+
+
+def add_user_stats(user_history: dict, total_collection: dict, args: Namespace):
     collected_stats = {
-        prefix + 'total_watch_time': stat_total_watch_time(history),
-        prefix + 'total_tv_watch_time': stat_tv_watch_time(history),
-        prefix + 'total_movie_watch_time': stat_movie_watch_time(history),
-        prefix + 'total_music_watch_time': stat_music_listen_time(history),
-        prefix + 'stat_tv_popular_show_count': stat_tv_popular_show_count(history),
-        prefix + 'stat_tv_popular_show_duration': stat_tv_popular_show_duration(history),
-        prefix + 'stat_platform_counter': stat_platform_counter(history)
+        "user_watch_time": stat_total_watch_time(user_history),
+        "user_tv_watch_time": prettify_time(stat_tv_watch_time(user_history)),
+        "user_movie_watch_time": prettify_time(stat_movie_watch_time(user_history)),
+        "user_music_watch_time": prettify_time(stat_music_listen_time(user_history)),
+        "user_tv_popular_show_count": stat_tv_popular_show_count(user_history),
+        "user_tv_popular_show_duration": stat_tv_popular_show_duration(user_history),
     }
+
+    platform_info = stat_platform_counter(user_history)
+    collected_stats["user_bandwidth_used"], platform_bandwidth = stat_bandwidth_used(
+        user_history
+    )
+
+    collected_stats["user_bandwidth_used"] = round(
+        collected_stats["user_bandwidth_used"] / 1024 / 1024 / 1024, 2
+    )
+    collected_stats["user_tv_bandwidth_used"] = round(
+        platform_bandwidth["episode"] / 1024 / 1024 / 1024, 2
+    )
+    collected_stats["user_movie_bandwidth_used"] = round(
+        platform_bandwidth["movie"] / 1024 / 1024 / 1024, 2
+    )
+    collected_stats["user_music_bandwidth_used"] = round(
+        platform_bandwidth["track"] / 1024 / 1024 / 1024, 2
+    )
+    collected_stats["user_bandwidth_used_percentage"] = round(
+        100
+        * collected_stats["user_bandwidth_used"]
+        / total_collection["total_bandwidth_used"],
+        3,
+    )
+
+    return collected_stats
+
+
+def add_global_stats(history: dict, args: Namespace):
+    collected_stats = {
+        "total_watch_time": stat_total_watch_time(history),
+        "total_tv_watch_time": prettify_time(stat_tv_watch_time(history)),
+        "total_movie_watch_time": prettify_time(stat_movie_watch_time(history)),
+        "total_music_watch_time": prettify_time(stat_music_listen_time(history)),
+        "total_tv_watch_time_minutes": stat_tv_watch_time(history),
+        "total_movie_watch_time_minutes": stat_movie_watch_time(history),
+        "total_music_watch_time_minutes": stat_music_listen_time(history),
+    }
+
+    ## Special Platform Stats
+    # Top show by Count
+    tv_popular_show_count = stat_tv_popular_show_count(history)
+    top_ten = sorted(
+        tv_popular_show_count.keys(),
+        key=lambda x: tv_popular_show_count[x],
+        reverse=True,
+    )[:10]
+
+    for i in range(10):
+        collected_stats["total_top_tv_show_count_" + str(i + 1) + "_name"] = top_ten[i]
+        collected_stats["total_top_tv_show_count_" + str(i + 1) + "_count"] = (
+            tv_popular_show_count[top_ten[i]]
+        )
+
+    # Top show by Duration
+    tv_popular_show_duration = stat_tv_popular_show_duration(history)
+    top_ten = sorted(
+        tv_popular_show_duration.keys(),
+        key=lambda x: tv_popular_show_duration[x],
+        reverse=True,
+    )[:10]
+
+    for i in range(10):
+        collected_stats["total_top_tv_show_duration_" + str(i + 1) + "_name"] = top_ten[
+            i
+        ]
+        collected_stats["total_top_tv_show_duration_" + str(i + 1) + "_count"] = (
+            tv_popular_show_duration[top_ten[i]]
+        )
+
+    # Most popular Platform
+    platform_info = stat_platform_counter(history)
+
+    (
+        collected_stats["total_tv_show_added_count"],
+        collected_stats["total_tv_episode_added_count"],
+    ) = stat_get_recently_added("episode", args.year)
+    collected_stats["total_movies_added_count"], _ = stat_get_recently_added(
+        "movie", args.year
+    )
+    (
+        collected_stats["total_music_album_added_count"],
+        collected_stats["total_music_track_added_count"],
+    ) = stat_get_recently_added("track", args.year)
+
+    collected_stats["total_bandwidth_used"], platform_bandwidth = stat_bandwidth_used(
+        history
+    )
+
+    # Translate from byte to gigabyte
+    collected_stats["total_bandwidth_used"] = round(
+        collected_stats["total_bandwidth_used"] / 1024 / 1024 / 1024, 2
+    )
+    collected_stats["total_tv_bandwidth_used"] = round(
+        platform_bandwidth["episode"] / 1024 / 1024 / 1024, 2
+    )
+    collected_stats["total_movie_bandwidth_used"] = round(
+        platform_bandwidth["movie"] / 1024 / 1024 / 1024, 2
+    )
+    collected_stats["total_music_bandwidth_used"] = round(
+        platform_bandwidth["track"] / 1024 / 1024 / 1024, 2
+    )
+
+    collected_stats["total_tv_bandwidth_used_percent"] = round(
+        100
+        * collected_stats["total_tv_bandwidth_used"]
+        / collected_stats["total_bandwidth_used"],
+        3,
+    )
+    collected_stats["total_movie_bandwidth_used_percent"] = round(
+        100
+        * collected_stats["total_movie_bandwidth_used"]
+        / collected_stats["total_bandwidth_used"],
+        3,
+    )
+    collected_stats["total_music_bandwidth_used_percent"] = round(
+        100
+        * collected_stats["total_music_bandwidth_used"]
+        / collected_stats["total_bandwidth_used"],
+        3,
+    )
+
+    # Most Common Hour of day watched
+    # Most popular TV shows
 
     return collected_stats
 
 
 def stat_total_watch_time(history: dict):
+    """
+    Returns the total watch time in minutes.
+
+    :param history: dictionary of total user interactions from ``network.get_general_watch_history()`` or ``network.get_user_watch_history()``
+    :return: total watch time in minutes
+    :rtype: int
+    """
     return history.get("total_duration")
 
 
 def stat_tv_watch_time(history: dict):
     minutes = 0
-    for entry in history['data']:
-        if 'media_type' in entry and entry['media_type'] == 'episode':
-            minutes += entry['play_duration']
+    for entry in history["data"]:
+        if "media_type" in entry and entry["media_type"] == "episode":
+            minutes += entry["play_duration"]
     return minutes
 
 
 def stat_movie_watch_time(history: dict):
     minutes = 0
-    for entry in history['data']:
-        if 'media_type' in entry and entry['media_type'] == 'movie':
-            minutes += entry['play_duration']
+    for entry in history["data"]:
+        if "media_type" in entry and entry["media_type"] == "movie":
+            minutes += entry["play_duration"]
     return minutes
 
 
 def stat_music_listen_time(history: dict):
     minutes = 0
-    for entry in history['data']:
-        if 'media_type' in entry and entry['media_type'] == 'track':
-            minutes += entry['play_duration']
+    for entry in history["data"]:
+        if "media_type" in entry and entry["media_type"] == "track":
+            minutes += entry["play_duration"]
     return minutes
 
 
 def stat_tv_popular_show_count(history: dict):
     show_counter = {}
-    for entry in history['data']:
-        if 'media_type' in entry and entry['media_type'] == 'episode':
+    for entry in history["data"]:
+        if "media_type" in entry and entry["media_type"] == "episode":
             # Add episode to show watch counter
-            if entry['grandparent_title'] not in show_counter:
-                show_counter[entry['grandparent_title']] = 0
-            show_counter[entry['grandparent_title']] += 1
+            if entry["grandparent_title"] not in show_counter:
+                show_counter[entry["grandparent_title"]] = 0
+            show_counter[entry["grandparent_title"]] += 1
     return show_counter
+
 
 def stat_tv_popular_show_duration(history: dict):
     show_counter = {}
-    for entry in history['data']:
-        if 'media_type' in entry and entry['media_type'] == 'episode':
+    for entry in history["data"]:
+        if "media_type" in entry and entry["media_type"] == "episode":
             # Add episode to show watch counter
-            if entry['grandparent_title'] not in show_counter:
-                show_counter[entry['grandparent_title']] = 0
-            show_counter[entry['grandparent_title']] += entry['play_duration']
+            if entry["grandparent_title"] not in show_counter:
+                show_counter[entry["grandparent_title"]] = 0
+            show_counter[entry["grandparent_title"]] += entry["play_duration"]
     return show_counter
 
 
 def stat_platform_counter(history: dict):
     platform_counter = {}
-    for entry in history['data']:
-        if 'media_type' in entry and entry['media_type'] == 'episode':
-            if entry['platform'] not in platform_counter:
-                platform_counter[entry['platform']] = 0
-            platform_counter[entry['platform']] += 1
+    for entry in history["data"]:
+        if "media_type" in entry and entry["media_type"] == "episode":
+            if entry["platform"] not in platform_counter:
+                platform_counter[entry["platform"]] = 0
+            platform_counter[entry["platform"]] += 1
     return platform_counter
 
+
+def stat_bandwidth_used(history: dict):
+    bandwidth = 0
+    platform_bandwidth = {"episode": 0, "movie": 0, "track": 0}
+
+    sections = get_library_section_ids()
+
+    for entry in history["data"]:
+        size = 0
+        if entry["media_type"] == "episode":
+            size = get_episode_file_size(
+                entry["rating_key"], entry["parent_rating_key"]
+            )
+
+        elif entry["media_type"] == "track":
+            size = get_episode_file_size(
+                entry["rating_key"], entry["parent_rating_key"]
+            )
+
+        elif entry["media_type"] == "movie":
+            size = get_movie_file_size(sections["movie"], entry["title"])
+
+        # Add to bandwidth if valid size
+        if size > 0:
+            bandwidth += size
+            platform_bandwidth[entry["media_type"]] += size
+
+    return bandwidth, platform_bandwidth
+
+
+def stat_get_recently_added(library: str, year: int):
+    sections = get_library_section_ids()
+    if library == "episode":
+        return 0, 0
+
+    elif library == "movie":
+        movie_counter = 0
+        for section in sections["movie"]:
+            for movie in get_full_media_info(section):
+                if datetime.fromtimestamp(int(movie["added_at"])).year > year:
+                    continue
+                elif datetime.fromtimestamp(int(movie["added_at"])).year == year:
+                    movie_counter += 1
+                else:
+                    break
+        return movie_counter, 0
+
+    elif library == "track":
+        return 0, 0

@@ -1,3 +1,4 @@
 .env
-output.html
+*output.html
 .idea/
+*.pyc

@@ -2,17 +2,30 @@
 
 This program is designed to extract user statistics for the year 2024
 
-## Organization
+## Statistical Functions Implemented
+These statistic functions can be found in `statistics.py` 
 
-`main.py` is meant for general retrieval logic, and export maintenance
+### Global Stats
 
-`statistics.py` is meant for all Stat parsing and creation
+- Total watch time
+- Total TV Show watch time
+- Total Movie watch time
+- Total Music watch time
+- Favorite TV Show by watch time
+- Favorite TV Show by count
+- Most watched platform
+- Total data streamed
+- Most common hour of day
 
-## Statistics Tracked
+### User Related Stats
 
-- total_watch_time
-- total_tv_watch_time
-- total_movie_watch_time
-- total_music_watch_time
-- stat_tv_popular_show
-- stat_platform_counter
+- Total watch time
+- Total TV Show watch time
+- Total Movie watch time
+- Total Music watch time
+- Favorite TV Show by watch time
+- Favorite TV Show by count
+- Most watched platform
+- Total data streamed
+- Most common hour of day
+- Percentage of total bandwidth used

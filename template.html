@@ -3,6 +3,9 @@
 	<meta charset="utf-8">
 	<meta name="viewport" ontent="width=device-width, initial-scale=1">
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.js"></script>
+
 </head>
 <body>
 <nav class="navbar sticky-top navbar-expand-lg navbar-dark bg-dark">
@@ -39,48 +42,213 @@
 		</p>
 
 		<p class="fs-4">Without further ado, here are this years statistics!</p>
-		<hr class="col-1 my-4">
 
 	</div>
-	<div class="col-lg-8 px-0">
-		<h2 id="server-stats">Server Wide Statistics</h2>
-		<table class="table table-striped">
-			<tbody>
-			<tr>
-				<th scope="row">Total Storage Size</th>
-				<td>80 TB</td>
-			</tr>
-			<tr>
-				<th scope="row">Storage Capacity Added this year</th>
-				<td>32 TB</td>
-			</tr>
-			<tr>
-				<th scope="row">TV Shows added this year</th>
-				<td>{% all_tv_added %}</td>
-			</tr>
-			<tr>
-				<th scope="row">Movies added this year</th>
-				<td>{% all_movies_added %}</td>
-			</tr>
-			<tr>
-				<th scope="row">Music added this year</th>
-				<td>{% all_music_added %}</td>
-			</tr>
-			</tbody>
-		</table>
-
-
-		<div class="progress" role="progressbar" aria-label="Success example" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">
-			<div class="progress-bar bg-success" style="width: 25%"></div>
+	<div class="container">
+		<hr class="col-1 my-4">
+		<div class="row">
+			<div class="col-6">
+				<h2 id="server-stats">Server Wide Statistics</h2>
+				<h3>General Statistics</h3>
+				<table class="table table-striped">
+					<tbody>
+					<tr>
+						<th scope="row">Total Storage Size</th>
+						<td>80 TB</td>
+					</tr>
+					<tr>
+						<th scope="row">Storage Capacity Added this year</th>
+						<td>32 TB</td>
+					</tr>
+					<tr>
+						<th scope="row">Movies added this year</th>
+						<td>{% total_movies_added_count %}</td>
+					</tr>
+					<tr>
+						<th scope="row">TV Shows added this year</th>
+						<td>{% total_tv_show_added_count %}</td>
+					</tr>
+					<tr>
+						<th scope="row">TV Episodes added this year</th>
+						<td>{% total_tv_episode_added_count %}</td>
+					</tr>
+					<tr>
+						<th scope="row">Music Albums added this year</th>
+						<td>{% total_music_album_added_count %}</td>
+					</tr>
+					<tr>
+						<th scope="row">Music Tracks added this year</th>
+						<td>{% total_music_track_added_count %}</td>
+					</tr>
+					<tr>
+						<th scope="row">Total Data Streamed (in Gb)</th>
+						<td>{% total_bandwidth_used %}</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="col-4">
+				<figure class="figure">
+					<canvas id="addedStorage" style="width:100%;max-width:700px"></canvas>
+				</figure>
+			</div>
 		</div>
 
+		<hr class="col-1 my-4">
+
+		<div class="row">
+			<div class="col-10">
+				<h4>Total Bandwidth Used by Media Type</h4>
+				<p>
+					For comparison; The distance between the sun and the earth is 93 million miles.
+					If you were to convert the amount of bytes of data streamed from my Plex server into inches, that would be approximately 97 million miles.
+					There are more bytes streamed than there are inches between us and the Sun!
+				</p>
+				<figure class="figure col-8">
+					<canvas id="totalBandwidthUsed" style="width:100%;max-width:700px"></canvas>
+				</figure>
+			</div>
+		</div>
 
 		<hr class="col-1 my-4">
+
+		<div class="row">
+			<div class="col-6">
+				<h3>Overall Watch Time Statistics</h3>
+				<table class="table table-striped">
+					<tbody>
+					<tr>
+						<th scope="row">Total Hours in a Year</th>
+						<td>365 days</td>
+					</tr>
+					<tr>
+						<th scope="row">Total Watch Time</th>
+						<td>{% total_watch_time %}</td>
+					</tr>
+					<tr>
+						<th scope="row">Total TV Show Watch Time</th>
+						<td>{% total_tv_watch_time %}</td>
+					</tr>
+					<tr>
+						<th scope="row">Total Movie Watch Time</th>
+						<td>{% total_movie_watch_time %}</td>
+					</tr>
+					<tr>
+						<th scope="row">Total Music Listen Time</th>
+						<td>{% total_music_watch_time %}</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+			<div class="col-4">
+				<figure class="figure">
+					<canvas id="totalWatchTime" style="width:100%;max-width:700px"></canvas>
+				</figure>
+			</div>
+		</div>
 	</div>
+
+	<hr class="col-1 my-4">
+
 	<div class="col-lg-8 px-0">
 		<h2 id="user-stats">{% user_name %} Statistics</h2>
 	</div>
+	<p>
+		<b>Total Bandwidth Used:</b> {% user_bandwidth_used %} Gb
+	</p>
+	<div class="progress-stacked" style="height: 30px">
+		<div class="progress" role="progressbar" aria-label="Your Usage" aria-valuenow="{% user_bandwidth_used_percentage %}" aria-valuemin="0" aria-valuemax="100" style="height: 30px; width: {% user_bandwidth_used_percentage %}%">
+			<div class="progress-bar">Your Usage</div>
+		</div>
+	</div>
 </div>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+	<script>
+		// Charts built dynamically
+		new Chart("addedStorage", {
+			type: "pie",
+			data: {
+				labels: ["2024", "2023", "2022", "2021", "2020"],
+				datasets: [{
+					backgroundColor: ['aquamarine', 'cornflowerblue', 'darkred', 'blueviolet', 'forestgreen'],
+					data: ["32", "16", "16", "8", "8"]
+				}]
+			},
+			options: {
+				title: {
+					display: true,
+					text: "Plex Storage Additions by Year in Terabytes"
+				}
+			}
+		});
+
+		new Chart("totalBandwidthUsed", {
+			type: "pie",
+			data: {
+				labels: ["TV Streamed", "Movie Watch Time", "Music Listen Time"],
+				datasets: [{
+					backgroundColor: ['darkred', 'blueviolet', 'forestgreen'],
+					data: ["{% total_tv_bandwidth_used %}", "{% total_movie_bandwidth_used %}", "{% total_music_bandwidth_used %}"]
+				}]
+			},
+			options: {
+				title: {
+					display: true,
+					text: "Total Bandwidth used by Media Type in GB"
+				}
+			}
+		});
+
+		new Chart("userBandwidthUsed", {
+			type: "pie",
+			data: {
+				labels: ["TV Streamed", "Movie Watch Time", "Music Listen Time"],
+				datasets: [{
+					backgroundColor: ['cornflowerblue', 'darkred', 'blueviolet'],
+					data: ["{% user_tv_bandwidth_used %}", "{% user_movie_bandwidth_used %}", "{% user_music_bandwidth_used %}"]
+				}]
+			},
+			options: {
+				title: {
+					display: true,
+					text: "{% user_name %}'s Bandwidth used by Media Type in GB"
+				}
+			}
+		});
+
+		new Chart("totalWatchTime", {
+			type: "pie",
+			data: {
+				labels: ["TV Show Watch Time", "Movie Watch Time", "Music Listen Time"],
+				datasets: [{
+					backgroundColor: ['aquamarine', 'cornflowerblue', 'darkred'],
+					data: ["{% total_tv_watch_time_minutes %}", "{% total_movie_watch_time_minutes %}", "{% total_music_watch_time_minutes %}"]
+				}]
+			},
+			options: {
+				title: {
+					display: true,
+					text: "Total Watch Time by Media Type in Minutes"
+				}
+			}
+		});
+
+		new Chart("userWatchTime", {
+			type: "pie",
+			data: {
+				labels: ["TV Show Watch Time", "Movie Watch Time", "Music Listen Time"],
+				datasets: [{
+					backgroundColor: ['khaki', 'aquamarine', 'cornflowerblue'],
+					data: ["{% user_tv_watch_time %}", "{% user_movie_watch_time %}", "{% user_music_watch_time %}"]
+				}]
+			},
+			options: {
+				title: {
+					display: true,
+					text: "{% user_name %}'s Watch Time by Media Type in Minutes"
+				}
+			}
+		});
+	</script>
 </body>
 </html>
