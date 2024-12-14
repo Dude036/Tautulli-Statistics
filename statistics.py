@@ -6,31 +6,50 @@ def prettify_time(time: int):
     date = datetime.fromtimestamp(time)
     origin = datetime.fromisoformat("1970-01-01T00:00:00")
     td = date - origin
-    return (
-        str(td.days)
-        + " days "
-        + str(td.seconds // 60 // 60)
-        + " hrs "
-        + str(td.seconds // 60)
-        + " mins"
-    )
+    ret_str = str(td.days) + " days "
+    ret_str += str(td.seconds // 60 // 60) + " hrs "
+    ret_str += str(td.seconds % 60) + " mins"
+    return ret_str
 
 
 def add_user_stats(user_history: dict, total_collection: dict, args: Namespace):
     collected_stats = {
         "user_watch_time": stat_total_watch_time(user_history),
-        "user_tv_watch_time": prettify_time(stat_tv_watch_time(user_history)),
-        "user_movie_watch_time": prettify_time(stat_movie_watch_time(user_history)),
-        "user_music_watch_time": prettify_time(stat_music_listen_time(user_history)),
-        "user_tv_popular_show_count": stat_tv_popular_show_count(user_history),
-        "user_tv_popular_show_duration": stat_tv_popular_show_duration(user_history),
+        "user_tv_watch_time_minutes": stat_media_watch_time(user_history, 'episode'),
+        "user_movie_watch_time_minutes": stat_media_watch_time(user_history, 'movie'),
+        "user_music_watch_time_minutes": stat_media_watch_time(user_history, 'track'),
     }
 
+    ## Derived stats
+    collected_stats["user_tv_watch_time"] = prettify_time(collected_stats['user_tv_watch_time_minutes'])
+    collected_stats["user_movie_watch_time"] = prettify_time(collected_stats['user_movie_watch_time_minutes'])
+    collected_stats["user_music_watch_time"] = prettify_time(collected_stats['user_music_watch_time_minutes'])
+
+    ## Special stats
+    # Platform Info
     platform_info = stat_platform_counter(user_history)
+
+    # Top Show by count
+    tv_popular_show_count = stat_tv_popular_show_count(user_history)
+    top_ten = sorted(
+        tv_popular_show_count.keys(),
+        key=lambda x: tv_popular_show_count[x],
+        reverse=True,
+    )[:5]
+
+    for i in range(5):
+        collected_stats["user_top_tv_show_count_" + str(i + 1) + "_name"] = top_ten[i]
+        collected_stats["user_top_tv_show_count_" + str(i + 1) + "_count"] = (
+            tv_popular_show_count[top_ten[i]]
+        )
+
+
+    # Bandwidth Info
     collected_stats["user_bandwidth_used"], platform_bandwidth = stat_bandwidth_used(
         user_history
     )
 
+    # Translate from byte to gigabyte
     collected_stats["user_bandwidth_used"] = round(
         collected_stats["user_bandwidth_used"] / 1024 / 1024 / 1024, 2
     )
@@ -56,13 +75,17 @@ def add_user_stats(user_history: dict, total_collection: dict, args: Namespace):
 def add_global_stats(history: dict, args: Namespace):
     collected_stats = {
         "total_watch_time": stat_total_watch_time(history),
-        "total_tv_watch_time": prettify_time(stat_tv_watch_time(history)),
-        "total_movie_watch_time": prettify_time(stat_movie_watch_time(history)),
-        "total_music_watch_time": prettify_time(stat_music_listen_time(history)),
-        "total_tv_watch_time_minutes": stat_tv_watch_time(history),
-        "total_movie_watch_time_minutes": stat_movie_watch_time(history),
-        "total_music_watch_time_minutes": stat_music_listen_time(history),
+        "total_tv_watch_time_minutes": stat_media_watch_time(history, 'episode'),
+        "total_movie_watch_time_minutes": stat_media_watch_time(history, 'movie'),
+        "total_music_watch_time_minutes": stat_media_watch_time(history, 'track'),
     }
+
+    ## Derived stats
+    collected_stats["total_tv_watch_time"] = prettify_time(collected_stats["total_tv_watch_time_minutes"])
+    collected_stats["total_movie_watch_time"] = prettify_time(collected_stats["total_movie_watch_time_minutes"])
+    collected_stats["total_music_watch_time"] = prettify_time(collected_stats["total_music_watch_time_minutes"])
+
+    collected_stats["total_active_use_time"] = round((collected_stats["total_tv_watch_time_minutes"] + collected_stats["total_movie_watch_time_minutes"] + collected_stats["total_music_watch_time_minutes"]) / (60 * 24 * 365), 2)
 
     ## Special Platform Stats
     # Top show by Count
@@ -77,22 +100,6 @@ def add_global_stats(history: dict, args: Namespace):
         collected_stats["total_top_tv_show_count_" + str(i + 1) + "_name"] = top_ten[i]
         collected_stats["total_top_tv_show_count_" + str(i + 1) + "_count"] = (
             tv_popular_show_count[top_ten[i]]
-        )
-
-    # Top show by Duration
-    tv_popular_show_duration = stat_tv_popular_show_duration(history)
-    top_ten = sorted(
-        tv_popular_show_duration.keys(),
-        key=lambda x: tv_popular_show_duration[x],
-        reverse=True,
-    )[:10]
-
-    for i in range(10):
-        collected_stats["total_top_tv_show_duration_" + str(i + 1) + "_name"] = top_ten[
-            i
-        ]
-        collected_stats["total_top_tv_show_duration_" + str(i + 1) + "_count"] = (
-            tv_popular_show_duration[top_ten[i]]
         )
 
     # Most popular Platform
@@ -164,26 +171,16 @@ def stat_total_watch_time(history: dict):
     return history.get("total_duration")
 
 
-def stat_tv_watch_time(history: dict):
+def stat_media_watch_time(history: dict, media_type: str):
+    """
+    Returns the total watch time in minutes by media type.
+    :param history:  dictionary of total user interactions from ``network.get_general_watch_history()`` or ``network.get_user_watch_history()``
+    :param media_type: The Media type to narrow search. Accepts: ('episode', 'movie', 'track')
+    :return: an integer of minutes of watch time
+    """
     minutes = 0
     for entry in history["data"]:
-        if "media_type" in entry and entry["media_type"] == "episode":
-            minutes += entry["play_duration"]
-    return minutes
-
-
-def stat_movie_watch_time(history: dict):
-    minutes = 0
-    for entry in history["data"]:
-        if "media_type" in entry and entry["media_type"] == "movie":
-            minutes += entry["play_duration"]
-    return minutes
-
-
-def stat_music_listen_time(history: dict):
-    minutes = 0
-    for entry in history["data"]:
-        if "media_type" in entry and entry["media_type"] == "track":
+        if "media_type" in entry and entry["media_type"] == media_type:
             minutes += entry["play_duration"]
     return minutes
 

@@ -1,6 +1,6 @@
 import datetime
 import re
-from xmlrpc.client import DateTime
+from pprint import pprint
 
 from dotenv import load_dotenv
 import argparse
@@ -14,12 +14,6 @@ parser = argparse.ArgumentParser(
     description="A program for retrieving and parsing watch statistics from a remote "
     "instance of Tautulli",
 )
-# parser.add_argument(
-#     "-v",
-#     "--verbose",
-#     action=argparse.BooleanOptionalAction,
-#     help="Enables verbose logging of program running",
-# )
 parser.add_argument(
     "-u",
     "--user",
@@ -45,6 +39,7 @@ def export_to_html(watch_history: dict):
 
     # Replace strings
     replacements = findall(r"({% ([\w\d_]+) %})", filedata)
+    print("============ Replacing Data ============")
     for point in replacements:
         print("Replacing " + point[0])
         try:
@@ -79,6 +74,6 @@ if __name__ == "__main__":
     print("============ Collection Time ===========")
     print(end - start)
     print("============ Collected Data ============")
-    print(general_data)
+    pprint(general_data)
 
     export_to_html(general_data)

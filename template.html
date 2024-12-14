@@ -118,12 +118,12 @@
 				<table class="table table-striped">
 					<tbody>
 					<tr>
-						<th scope="row">Total Hours in a Year</th>
-						<td>365 days</td>
-					</tr>
-					<tr>
 						<th scope="row">Total Watch Time</th>
 						<td>{% total_watch_time %}</td>
+					</tr>
+					<tr>
+						<th scope="row">Total Active Use Time</th>
+						<td>Server was active {% total_active_use_time %}% of the year</td>
 					</tr>
 					<tr>
 						<th scope="row">Total TV Show Watch Time</th>
@@ -146,6 +146,71 @@
 				</figure>
 			</div>
 		</div>
+
+		<hr class="col-1 my-4">
+
+		<h3>Top 10 Shows</h3>
+		<table class="table table-striped">
+			<thead class="thead-dark">
+			<tr>
+				<th scope="col">Rank</th>
+				<th scope="col">Show Name</th>
+				<th scope="col">Show Watch Count</th>
+			</tr>
+			</thead>
+			<tbody>
+			<tr style="line-height: 60px; min-height: 60px; height: 60px; font-size: xx-large">
+				<th scope="row">1</th>
+				<td>{% total_top_tv_show_count_1_name %}</td>
+				<td>{% total_top_tv_show_count_1_count %}</td>
+			</tr>
+			<tr style="line-height: 40px; min-height: 40px; height: 40px; font-size: x-large">
+				<th scope="row">2</th>
+				<td>{% total_top_tv_show_count_2_name %}</td>
+				<td>{% total_top_tv_show_count_2_count %}</td>
+			</tr>
+			<tr style="line-height: 30px; min-height: 30px; height: 30px; font-size: large">
+				<th scope="row">3</th>
+				<td>{% total_top_tv_show_count_3_name %}</td>
+				<td>{% total_top_tv_show_count_3_count %}</td>
+			</tr>
+			<tr>
+				<th scope="row">4</th>
+				<td>{% total_top_tv_show_count_4_name %}</td>
+				<td>{% total_top_tv_show_count_4_count %}</td>
+			</tr>
+			<tr>
+				<th scope="row">5</th>
+				<td>{% total_top_tv_show_count_5_name %}</td>
+				<td>{% total_top_tv_show_count_5_count %}</td>
+			</tr>
+			<tr>
+				<th scope="row">6</th>
+				<td>{% total_top_tv_show_count_6_name %}</td>
+				<td>{% total_top_tv_show_count_6_count %}</td>
+			</tr>
+			<tr>
+				<th scope="row">7</th>
+				<td>{% total_top_tv_show_count_7_name %}</td>
+				<td>{% total_top_tv_show_count_7_count %}</td>
+			</tr>
+			<tr>
+				<th scope="row">8</th>
+				<td>{% total_top_tv_show_count_8_name %}</td>
+				<td>{% total_top_tv_show_count_8_count %}</td>
+			</tr>
+			<tr>
+				<th scope="row">9</th>
+				<td>{% total_top_tv_show_count_9_name %}</td>
+				<td>{% total_top_tv_show_count_9_count %}</td>
+			</tr>
+			<tr>
+				<th scope="row">10</th>
+				<td>{% total_top_tv_show_count_10_name %}</td>
+				<td>{% total_top_tv_show_count_10_count %}</td>
+			</tr>
+			</tbody>
+		</table>
 	</div>
 
 	<hr class="col-1 my-4">
@@ -153,6 +218,11 @@
 	<div class="col-lg-8 px-0">
 		<h2 id="user-stats">{% user_name %} Statistics</h2>
 	</div>
+
+	<div class="col-lg-8 px-0">
+		<h3>{% user_name %} General Statistics</h3>
+	</div>
+
 	<p>
 		<b>Total Bandwidth Used:</b> {% user_bandwidth_used %} Gb
 	</p>
@@ -161,6 +231,80 @@
 			<div class="progress-bar">Your Usage</div>
 		</div>
 	</div>
+
+	<hr class="col-1 my-4">
+
+	<div class="col-lg-8 px-0">
+		<h3>{% user_name %} Watch Statistics</h3>
+	</div>
+	<div class="row">
+		<div class="col-6">
+			<h3>Overall Watch Time Statistics</h3>
+			<table class="table table-striped">
+				<tbody>
+				<tr>
+					<th scope="row">Total Watch Time</th>
+					<td>{% user_watch_time %}</td>
+				</tr>
+				<tr>
+					<th scope="row">Total TV Show Watch Time</th>
+					<td>{% user_tv_watch_time %}</td>
+				</tr>
+				<tr>
+					<th scope="row">Total Movie Watch Time</th>
+					<td>{% user_movie_watch_time %}</td>
+				</tr>
+				<tr>
+					<th scope="row">Total Music Listen Time</th>
+					<td>{% user_music_watch_time %}</td>
+				</tr>
+				</tbody>
+			</table>
+		</div>
+		<div class="col-4">
+			<figure class="figure">
+				<canvas id="userWatchTime" style="width:100%;max-width:700px"></canvas>
+			</figure>
+		</div>
+	</div>
+
+	<h3>{% user_name %}'s Top 5 Shows</h3>
+	<table class="table table-striped">
+		<thead class="thead-dark">
+		<tr>
+			<th scope="col">Rank</th>
+			<th scope="col">Show Name</th>
+			<th scope="col">Show Watch Count</th>
+		</tr>
+		</thead>
+		<tbody>
+		<tr style="line-height: 60px; min-height: 60px; height: 60px; font-size: xx-large">
+			<th scope="row">1</th>
+			<td>{% user_top_tv_show_count_1_name %}</td>
+			<td>{% user_top_tv_show_count_1_count %}</td>
+		</tr>
+		<tr style="line-height: 40px; min-height: 40px; height: 40px; font-size: x-large">
+			<th scope="row">2</th>
+			<td>{% user_top_tv_show_count_2_name %}</td>
+			<td>{% user_top_tv_show_count_2_count %}</td>
+		</tr>
+		<tr style="line-height: 30px; min-height: 30px; height: 30px; font-size: large">
+			<th scope="row">3</th>
+			<td>{% user_top_tv_show_count_3_name %}</td>
+			<td>{% user_top_tv_show_count_3_count %}</td>
+		</tr>
+		<tr>
+			<th scope="row">4</th>
+			<td>{% user_top_tv_show_count_4_name %}</td>
+			<td>{% user_top_tv_show_count_4_count %}</td>
+		</tr>
+		<tr>
+			<th scope="row">5</th>
+			<td>{% user_top_tv_show_count_5_name %}</td>
+			<td>{% user_top_tv_show_count_5_count %}</td>
+		</tr>
+		</tbody>
+	</table>
 </div>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 	<script>
@@ -239,7 +383,7 @@
 				labels: ["TV Show Watch Time", "Movie Watch Time", "Music Listen Time"],
 				datasets: [{
 					backgroundColor: ['khaki', 'aquamarine', 'cornflowerblue'],
-					data: ["{% user_tv_watch_time %}", "{% user_movie_watch_time %}", "{% user_music_watch_time %}"]
+					data: ["{% user_tv_watch_time_minutes %}", "{% user_movie_watch_time_minutes %}", "{% user_music_watch_time_minutes %}"]
 				}]
 			},
 			options: {
