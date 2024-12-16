@@ -4,7 +4,7 @@ from datetime import datetime
 
 def prettify_time(time: int):
     date = datetime.fromtimestamp(time)
-    origin = datetime.fromisoformat("1970-01-01T00:00:00")
+    origin = datetime.fromtimestamp(0)
     td = date - origin
     ret_str = str(td.days) + " days "
     ret_str += str(td.seconds // 60 // 60) + " hrs "
@@ -14,13 +14,14 @@ def prettify_time(time: int):
 
 def add_user_stats(user_history: dict, total_collection: dict, args: Namespace):
     collected_stats = {
-        "user_watch_time": stat_total_watch_time(user_history),
+        "user_watch_time_minutes": stat_total_watch_time(user_history),
         "user_tv_watch_time_minutes": stat_media_watch_time(user_history, 'episode'),
         "user_movie_watch_time_minutes": stat_media_watch_time(user_history, 'movie'),
         "user_music_watch_time_minutes": stat_media_watch_time(user_history, 'track'),
     }
 
     ## Derived stats
+    collected_stats["user_watch_time"] = prettify_time(collected_stats['user_watch_time_minutes'])
     collected_stats["user_tv_watch_time"] = prettify_time(collected_stats['user_tv_watch_time_minutes'])
     collected_stats["user_movie_watch_time"] = prettify_time(collected_stats['user_movie_watch_time_minutes'])
     collected_stats["user_music_watch_time"] = prettify_time(collected_stats['user_music_watch_time_minutes'])
@@ -35,13 +36,17 @@ def add_user_stats(user_history: dict, total_collection: dict, args: Namespace):
         tv_popular_show_count.keys(),
         key=lambda x: tv_popular_show_count[x],
         reverse=True,
-    )[:5]
+    )[:10]
 
-    for i in range(5):
-        collected_stats["user_top_tv_show_count_" + str(i + 1) + "_name"] = top_ten[i]
-        collected_stats["user_top_tv_show_count_" + str(i + 1) + "_count"] = (
-            tv_popular_show_count[top_ten[i]]
-        )
+    for i in range(10):
+        if i >= len(top_ten):
+            collected_stats["user_top_tv_show_count_" + str(i + 1) + "_name"] = "---"
+            collected_stats["user_top_tv_show_count_" + str(i + 1) + "_count"] = "---"
+        else:
+            collected_stats["user_top_tv_show_count_" + str(i + 1) + "_name"] = top_ten[i]
+            collected_stats["user_top_tv_show_count_" + str(i + 1) + "_count"] = (
+                tv_popular_show_count[top_ten[i]]
+            )
 
 
     # Bandwidth Info
@@ -74,18 +79,19 @@ def add_user_stats(user_history: dict, total_collection: dict, args: Namespace):
 
 def add_global_stats(history: dict, args: Namespace):
     collected_stats = {
-        "total_watch_time": stat_total_watch_time(history),
+        "total_watch_time_minutes": stat_total_watch_time(history),
         "total_tv_watch_time_minutes": stat_media_watch_time(history, 'episode'),
         "total_movie_watch_time_minutes": stat_media_watch_time(history, 'movie'),
         "total_music_watch_time_minutes": stat_media_watch_time(history, 'track'),
     }
 
     ## Derived stats
+    collected_stats["total_watch_time"] = prettify_time(collected_stats["total_watch_time_minutes"])
     collected_stats["total_tv_watch_time"] = prettify_time(collected_stats["total_tv_watch_time_minutes"])
     collected_stats["total_movie_watch_time"] = prettify_time(collected_stats["total_movie_watch_time_minutes"])
     collected_stats["total_music_watch_time"] = prettify_time(collected_stats["total_music_watch_time_minutes"])
 
-    collected_stats["total_active_use_time"] = round((collected_stats["total_tv_watch_time_minutes"] + collected_stats["total_movie_watch_time_minutes"] + collected_stats["total_music_watch_time_minutes"]) / (60 * 24 * 365), 2)
+    collected_stats["total_active_use_time"] = round(collected_stats["total_watch_time_minutes"] / (60 * 24 * 365), 2)
 
     ## Special Platform Stats
     # Top show by Count
@@ -97,26 +103,29 @@ def add_global_stats(history: dict, args: Namespace):
     )[:10]
 
     for i in range(10):
-        collected_stats["total_top_tv_show_count_" + str(i + 1) + "_name"] = top_ten[i]
-        collected_stats["total_top_tv_show_count_" + str(i + 1) + "_count"] = (
-            tv_popular_show_count[top_ten[i]]
-        )
+        if i >= len(top_ten):
+            collected_stats["total_top_tv_show_count_" + str(i + 1) + "_name"] = "---"
+            collected_stats["total_top_tv_show_count_" + str(i + 1) + "_count"] = "---"
+        else:
+            collected_stats["total_top_tv_show_count_" + str(i + 1) + "_name"] = top_ten[i]
+            collected_stats["total_top_tv_show_count_" + str(i + 1) + "_count"] = tv_popular_show_count[top_ten[i]]
 
     # Most popular Platform
     platform_info = stat_platform_counter(history)
 
-    (
-        collected_stats["total_tv_show_added_count"],
-        collected_stats["total_tv_episode_added_count"],
-    ) = stat_get_recently_added("episode", args.year)
-    collected_stats["total_movies_added_count"], _ = stat_get_recently_added(
-        "movie", args.year
-    )
-    (
-        collected_stats["total_music_album_added_count"],
-        collected_stats["total_music_track_added_count"],
-    ) = stat_get_recently_added("track", args.year)
+    # Media added this year counters
+    tv_shows_added = stat_get_recently_added("episode", args.year)
+    collected_stats["total_tv_show_added_count"] = tv_shows_added['show_counter']
+    collected_stats["total_tv_episode_added_count"] = tv_shows_added['episode_counter']
+    collected_stats["total_tv_added_list"] = tv_shows_added['show_list']
 
+    collected_stats["total_movies_added_count"] = stat_get_recently_added("movie", args.year)['movie_counter']
+
+    music_added = stat_get_recently_added("track", args.year)
+    collected_stats["total_music_album_added_count"] = music_added['album_counter']
+    collected_stats["total_music_track_added_count"] = music_added['track_counter']
+
+    # Total Bandwidth used
     collected_stats["total_bandwidth_used"], platform_bandwidth = stat_bandwidth_used(
         history
     )
@@ -168,7 +177,10 @@ def stat_total_watch_time(history: dict):
     :return: total watch time in minutes
     :rtype: int
     """
-    return history.get("total_duration")
+    minutes = 0
+    for entry in history["data"]:
+        minutes += entry["play_duration"]
+    return minutes
 
 
 def stat_media_watch_time(history: dict, media_type: str):
@@ -248,20 +260,62 @@ def stat_bandwidth_used(history: dict):
 
 def stat_get_recently_added(library: str, year: int):
     sections = get_library_section_ids()
+    recently_added = {}
+
     if library == "episode":
-        return 0, 0
+        show_counter = 0
+        episode_counter = 0
+        show_list = set()
+        for section in sections["episode"]:
+            for show in get_full_media_info(section):
+                for season in get_specific_media_info(show['rating_key']):
+                    if datetime.fromtimestamp(int(season["added_at"])).year == year:
+                        if show['title'] not in show_list:
+                            show_list.add(show["title"])
+                            show_counter += 1
+
+                    for episode in get_specific_media_info(season['rating_key']):
+                        if datetime.fromtimestamp(int(episode["added_at"])).year != year:
+                            continue
+                        else:
+                            episode_counter += 1
+
+        recently_added['show_counter'] = show_counter
+        recently_added['episode_counter'] = episode_counter
+        recently_added['show_list'] = show_list
 
     elif library == "movie":
         movie_counter = 0
         for section in sections["movie"]:
             for movie in get_full_media_info(section):
-                if datetime.fromtimestamp(int(movie["added_at"])).year > year:
+                if datetime.fromtimestamp(int(movie["added_at"])).year != year:
                     continue
-                elif datetime.fromtimestamp(int(movie["added_at"])).year == year:
-                    movie_counter += 1
                 else:
-                    break
-        return movie_counter, 0
+                    movie_counter += 1
+
+        recently_added['movie_counter'] = movie_counter
 
     elif library == "track":
-        return 0, 0
+        album_counter = 0
+        track_counter = 0
+        album_list = set()
+
+        for section in sections["episode"]:
+            for artist in get_full_media_info(section):
+                for album in get_specific_media_info(artist['rating_key']):
+                    if datetime.fromtimestamp(int(album["added_at"])).year == year:
+                        if album['title'] not in album_list:
+                            album_list.add(album["title"])
+                            album_counter += 1
+
+                    for track in get_specific_media_info(album['rating_key']):
+                        if datetime.fromtimestamp(int(track["added_at"])).year != year:
+                            continue
+                        else:
+                            track_counter += 1
+
+        recently_added['album_counter'] = album_counter
+        recently_added['track_counter'] = track_counter
+        recently_added['album_list'] = album_list
+
+    return recently_added
