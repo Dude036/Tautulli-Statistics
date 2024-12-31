@@ -1,4 +1,5 @@
 import datetime
+import os.path
 import re
 from pprint import pprint
 
@@ -67,8 +68,15 @@ if __name__ == "__main__":
     user_data = get_user_watch_history(args)
     general_data.update(add_user_stats(user_data, general_data, args))
 
-    # Export
+    # Add potential note based on the Username
 
+    if os.path.isfile(args.user + ".note.txt"):
+        with open(args.user + ".note.txt", "r") as personal_note:
+            general_data.update({"personal_note": personal_note.readlines()})
+    else:
+        general_data.update({"personal_note": ""})
+
+    # Export
     end = datetime.datetime.now()
 
     print("============ Collection Time ===========")

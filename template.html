@@ -211,13 +211,26 @@
 			</tr>
 			</tbody>
 		</table>
+
+		<hr class="col-1 my-4">
+
+		<h3>Top 10 Ways to Watch Plex</h3>
+
+		<div style="height: 300px; width: 100%">
+			<canvas id="totalTopPlatform"></canvas>
+		</div>
 	</div>
 
 	<hr class="col-1 my-4">
 
-	<div class="col-lg-8 px-0">
-		<h2 id="user-stats">{% user_name %} Statistics</h2>
-	</div>
+	<div class="col-lg-8 px-0" style="margin-bottom: 40px">
+		<h2 id="user-stats">{% user_name %}'s Statistics</h2>
+		<p>
+			This section is just for you. These statistics represent your personal data, and your data alone.
+			If you are interested in a specific data point to add to next year's edition of this, please reach out to me!
+		</p>
+
+		{% personal_note %}
 
 	<div class="col-lg-8 px-0">
 		<h3>{% user_name %} General Statistics</h3>
@@ -268,7 +281,7 @@
 		</div>
 	</div>
 
-	<h3>{% user_name %}'s Top 5 Shows</h3>
+	<h3>{% user_name %}'s Top 10 Shows</h3>
 	<table class="table table-striped">
 		<thead class="thead-dark">
 		<tr>
@@ -418,6 +431,81 @@
 				}
 			}
 		});
+
+
+		let totalPlatformData = {
+			labels: [
+				"{% total_top_platform_count_1_name %}",
+				"{% total_top_platform_count_2_name %}",
+				"{% total_top_platform_count_3_name %}",
+				"{% total_top_platform_count_4_name %}",
+				"{% total_top_platform_count_5_name %}",
+				"{% total_top_platform_count_6_name %}",
+				"{% total_top_platform_count_7_name %}",
+				"{% total_top_platform_count_8_name %}",
+				"{% total_top_platform_count_9_name %}",
+				"{% total_top_platform_count_10_name %}"
+			],
+			datasets: [{
+				label: 'Total Usage Count by Platform',
+				backgroundColor: [
+					'rgba(255, 99, 132, 0.2)',
+					'rgba(255, 159, 64, 0.2)',
+					'rgba(255, 205, 86, 0.2)',
+					'rgba(75, 192, 192, 0.2)',
+					'rgba(54, 162, 235, 0.2)',
+					'rgba(153, 102, 255, 0.2)',
+					'rgba(196, 214, 96, 0.2)',
+					'rgba(151, 75, 27, 0.2)',
+					'rgba(174, 159, 205, 0.2)',
+					'rgba(201, 203, 207, 0.2)'
+				],
+				borderColor: [
+					'rgb(255, 99, 132)',
+					'rgb(255, 159, 64)',
+					'rgb(255, 205, 86)',
+					'rgb(75, 192, 192)',
+					'rgb(54, 162, 235)',
+					'rgb(153, 102, 255)',
+					'rgb(196, 214, 96)',
+					'rgb(151, 75, 27)',
+					'rgb(174, 159, 205)',
+					'rgb(201, 203, 207)'
+				],
+				borderWidth: 1,
+				data: [
+					{% total_top_platform_count_1_count %},
+					{% total_top_platform_count_2_count %},
+					{% total_top_platform_count_3_count %},
+					{% total_top_platform_count_4_count %},
+					{% total_top_platform_count_5_count %},
+					{% total_top_platform_count_6_count %},
+					{% total_top_platform_count_7_count %},
+					{% total_top_platform_count_8_count %},
+					{% total_top_platform_count_9_count %},
+					{% total_top_platform_count_10_count %}
+				]
+			}]
+		}
+
+		let totalPlatformOptions = {
+			title: {
+				text: "Total Usage by Platform"
+			},
+			scales: {
+				y: {
+					beginAtZero: true
+				}
+			},
+			responsive: true,
+			maintainAspectRatio: false
+		}
+
+		new Chart("totalTopPlatform", {
+			type: 'bar',
+			data: totalPlatformData,
+			options: totalPlatformOptions
+		})
 	</script>
 </body>
 </html>

@@ -27,9 +27,6 @@ def add_user_stats(user_history: dict, total_collection: dict, args: Namespace):
     collected_stats["user_music_watch_time"] = prettify_time(collected_stats['user_music_watch_time_minutes'])
 
     ## Special stats
-    # Platform Info
-    platform_info = stat_platform_counter(user_history)
-
     # Top Show by count
     tv_popular_show_count = stat_tv_popular_show_count(user_history)
     top_ten = sorted(
@@ -112,6 +109,16 @@ def add_global_stats(history: dict, args: Namespace):
 
     # Most popular Platform
     platform_info = stat_platform_counter(history)
+    top_platform = sorted(platform_info.keys(), key=lambda x: platform_info[x], reverse=True)[:10]
+
+    for i in range(10):
+        if i >= len(top_platform):
+            collected_stats["total_top_platform_count_" + str(i + 1) + "_name"] = "---"
+            collected_stats["total_top_platform_count_" + str(i + 1) + "_count"] = "0"
+        else:
+            collected_stats["total_top_platform_count_" + str(i + 1) + "_name"] = top_platform[i]
+            collected_stats["total_top_platform_count_" + str(i + 1) + "_count"] = platform_info[top_platform[i]]
+
 
     # Media added this year counters
     tv_shows_added = stat_get_recently_added("episode", args.year)
