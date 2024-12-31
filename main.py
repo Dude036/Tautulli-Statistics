@@ -72,7 +72,7 @@ if __name__ == "__main__":
 
     if os.path.isfile(args.user + ".note.txt"):
         with open(args.user + ".note.txt", "r") as personal_note:
-            general_data.update({"personal_note": personal_note.readlines()})
+            general_data.update({"personal_note": ''.join(personal_note.readlines())})
     else:
         general_data.update({"personal_note": ""})
 

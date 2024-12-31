@@ -1,6 +1,21 @@
 from network import *
 from datetime import datetime
 
+month_translator = {
+    1: "January",
+    2: "February",
+    3: "March",
+    4: "April",
+    5: "May",
+    6: "June",
+    7: "July",
+    8: "August",
+    9: "September",
+    10: "October",
+    11: "November",
+    12: "December"
+}
+
 
 def prettify_time(time: int):
     date = datetime.fromtimestamp(time)
@@ -75,6 +90,7 @@ def add_user_stats(user_history: dict, total_collection: dict, args: Namespace):
 
 
 def add_global_stats(history: dict, args: Namespace):
+    ## Direct Stats
     collected_stats = {
         "total_watch_time_minutes": stat_total_watch_time(history),
         "total_tv_watch_time_minutes": stat_media_watch_time(history, 'episode'),
@@ -170,8 +186,14 @@ def add_global_stats(history: dict, args: Namespace):
         3,
     )
 
-    # Most Common Hour of day watched
-    # Most popular TV shows
+    # Time data
+    date_data = stat_times_of_day(history, args.year)
+    for hour in range(24):
+        collected_stats['total_hour_' + '{:02d}'.format(hour) + '_watch_label'] = '{:02d}'.format(hour) + ':00'
+        collected_stats['total_hour_' + '{:02d}'.format(hour) + '_watch_count'] = date_data[hour]
+
+    for month in range(1, 13):
+        collected_stats['total_' + month_translator[month] + '_watch_count'] = date_data[month_translator[month]]
 
     return collected_stats
 
@@ -188,6 +210,35 @@ def stat_total_watch_time(history: dict):
     for entry in history["data"]:
         minutes += entry["play_duration"]
     return minutes
+
+def stat_times_of_day(history: dict, year: int):
+    # Month Data
+    date_data = {
+        'January': 0,
+        'February': 0,
+        'March': 0,
+        'April': 0,
+        'May': 0,
+        'June': 0,
+        'July': 0,
+        'August': 0,
+        'September': 0,
+        'October': 0,
+        'November': 0,
+        'December': 0,
+    }
+
+    # Hour of the Day Data
+    for hour in range(24):
+        date_data[hour] = 0
+
+    for entry in history["data"]:
+        specific = datetime.fromtimestamp(entry['date'])
+        if specific.year == year:
+            date_data[month_translator[specific.month]] += 1
+            date_data[specific.hour] += 1
+
+    return date_data
 
 
 def stat_media_watch_time(history: dict, media_type: str):

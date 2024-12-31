@@ -219,6 +219,18 @@
 		<div style="height: 300px; width: 100%">
 			<canvas id="totalTopPlatform"></canvas>
 		</div>
+
+		<div class="container">
+			<h3 style="margin-bottom: 10px;">Total Watch Count by Month and Hour</h3>
+			<div class="row">
+				<div class="col-6">
+					<canvas id="totalHourlyWatchCount" style="width:100%;max-width:700px"></canvas>
+				</div>
+				<div class="col-6">
+					<canvas id="totalMonthlyWatchCount" style="width:100%;max-width:700px"></canvas>
+				</div>
+			</div>
+		</div>
 	</div>
 
 	<hr class="col-1 my-4">
@@ -505,6 +517,165 @@
 			type: 'bar',
 			data: totalPlatformData,
 			options: totalPlatformOptions
+		})
+		let totalHourlyWatchCountData = {
+					labels: [
+						"{% total_hour_00_watch_label %}",
+						"{% total_hour_01_watch_label %}",
+						"{% total_hour_02_watch_label %}",
+						"{% total_hour_03_watch_label %}",
+						"{% total_hour_04_watch_label %}",
+						"{% total_hour_05_watch_label %}",
+						"{% total_hour_06_watch_label %}",
+						"{% total_hour_07_watch_label %}",
+						"{% total_hour_08_watch_label %}",
+						"{% total_hour_09_watch_label %}",
+						"{% total_hour_10_watch_label %}",
+						"{% total_hour_11_watch_label %}",
+						"{% total_hour_12_watch_label %}",
+						"{% total_hour_13_watch_label %}",
+						"{% total_hour_14_watch_label %}",
+						"{% total_hour_15_watch_label %}",
+						"{% total_hour_16_watch_label %}",
+						"{% total_hour_17_watch_label %}",
+						"{% total_hour_18_watch_label %}",
+						"{% total_hour_19_watch_label %}",
+						"{% total_hour_20_watch_label %}",
+						"{% total_hour_21_watch_label %}",
+						"{% total_hour_22_watch_label %}",
+						"{% total_hour_23_watch_label %}"
+					],
+					datasets: [{
+						label: 'Total Usage Count by Platform',
+						backgroundColor: [
+							'#EA8B31',
+							'#E1ABB9',
+							'#92D9CF',
+							'#43303C',
+							'#F194AF',
+							'#A6CF35',
+							'#DF7197',
+							'#330871',
+							'#064266',
+							'#6E2CD1',
+							'#67E079',
+							'#97ABBB',
+							'#655C43',
+							'#69AEF6',
+							'#FA587A',
+							'#5958D2',
+							'#0BEC96',
+							'#52852E',
+							'#8FADE9',
+							'#89312B',
+							'#C69E1A',
+							'#89F839',
+							'#2591B2',
+							'#746BB8',
+						],
+						data: [
+							{% total_hour_00_watch_count %},
+							{% total_hour_01_watch_count %},
+							{% total_hour_02_watch_count %},
+							{% total_hour_03_watch_count %},
+							{% total_hour_04_watch_count %},
+							{% total_hour_05_watch_count %},
+							{% total_hour_06_watch_count %},
+							{% total_hour_07_watch_count %},
+							{% total_hour_08_watch_count %},
+							{% total_hour_09_watch_count %},
+							{% total_hour_10_watch_count %},
+							{% total_hour_11_watch_count %},
+							{% total_hour_12_watch_count %},
+							{% total_hour_13_watch_count %},
+							{% total_hour_14_watch_count %},
+							{% total_hour_15_watch_count %},
+							{% total_hour_16_watch_count %},
+							{% total_hour_17_watch_count %},
+							{% total_hour_18_watch_count %},
+							{% total_hour_19_watch_count %},
+							{% total_hour_20_watch_count %},
+							{% total_hour_21_watch_count %},
+							{% total_hour_22_watch_count %},
+							{% total_hour_23_watch_count %}
+						]
+					}]
+		}
+		
+		new Chart("totalHourlyWatchCount", {
+			type: 'bar',
+			data: totalHourlyWatchCountData,
+			options: totalHourlyWatchCountOptions
+		})
+
+		let totalHourlyWatchCountOptions = {
+			title: {
+				text: "Usage Count by Hour of the Day"
+			},
+			scales: {
+				y: {
+					beginAtZero: true
+				}
+			},
+			responsive: true,
+			maintainAspectRatio: false
+		}
+		let totalMonthlyWatchCountData = {
+			labels: [
+				'January',
+				'February',
+				'March',
+				'April',
+				'May',
+				'June',
+				'July',
+				'August',
+				'September',
+				'October',
+				'November',
+				'December'
+			],
+			datasets: [{
+				label: 'Watch Count by Month',
+				backgroundColor: [
+					'rgb(75, 192, 192)',
+					'rgb(201, 203, 207)',
+					'rgb(255, 159, 64)',
+					'rgb(129, 227, 38)',
+					'rgb(153, 102, 255)',
+					'rgb(255, 205, 86)',
+					'rgb(54, 162, 235)',
+					'rgb(35, 40, 126)',
+					'rgb(151, 75, 27)',
+					'rgb(174, 159, 205)',
+					'rgb(255, 99, 132)',
+					'rgb(33, 96, 28)',
+				],
+				data: [
+					{% total_January_watch_count %},
+					{% total_February_watch_count %},
+					{% total_March_watch_count %},
+					{% total_April_watch_count %},
+					{% total_May_watch_count %},
+					{% total_June_watch_count %},
+					{% total_July_watch_count %},
+					{% total_August_watch_count %},
+					{% total_September_watch_count %},
+					{% total_October_watch_count %},
+					{% total_November_watch_count %},
+					{% total_December_watch_count %}
+				]
+			}]
+		}
+
+		let totalMonthlyWatchCountOptions = {
+
+		}
+
+		new Chart("totalMonthlyWatchCount", {
+			type: 'polarArea',
+			data: totalMonthlyWatchCountData,
+			options: totalMonthlyWatchCountOptions
 		})
 	</script>
 </body>
