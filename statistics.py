@@ -86,6 +86,16 @@ def add_user_stats(user_history: dict, total_collection: dict, args: Namespace):
         3,
     )
 
+    # Time data
+    date_data = stat_times_of_day(user_history, args.year)
+    for hour in range(24):
+        collected_stats['user_hour_' + '{:02d}'.format(hour) + '_watch_label'] = '{:02d}'.format(hour) + ':00'
+        collected_stats['user_hour_' + '{:02d}'.format(hour) + '_watch_count'] = date_data[hour]
+
+    for month in range(1, 13):
+        collected_stats['user_' + month_translator[month] + '_watch_count'] = date_data[month_translator[month]]
+
+
     return collected_stats
 
 

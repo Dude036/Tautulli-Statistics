@@ -115,6 +115,11 @@
 		<div class="row">
 			<div class="col-6">
 				<h3>Overall Watch Time Statistics</h3>
+				<p>
+					This past year, I only took the server down for a few days while we moved from Utah to Wisconsin.
+					But even still, to have someone watching something off of it for nearly half a year is wild to me.
+					It's such an honor that you're willing to spend so much of your time using my server for entertainment.
+				</p>
 				<table class="table table-striped">
 					<tbody>
 					<tr>
@@ -150,6 +155,11 @@
 		<hr class="col-1 my-4">
 
 		<h3>Top 10 Shows</h3>
+		<p>
+			According to Disney+, Bluey accounts for about 29% of all its traffic.
+			While I am not nearly on the level of Disney+, the trend of Bluey taking up a large chunk of traffic holds true for me.
+			For some reason, The metadata changed from Bluey to Bluey (2018), and I'm not sure why.
+		</p>
 		<table class="table table-striped">
 			<thead class="thead-dark">
 			<tr>
@@ -215,6 +225,11 @@
 		<hr class="col-1 my-4">
 
 		<h3>Top 10 Ways to Watch Plex</h3>
+		<p>
+			Xbox being the most used platform is kind of neat, but I think that maybe because Google products are broken down between many different clients.
+			For example, my TV registers Android, when I'm screen casting from my phone, but uses Plex for Android (TV) when watching from my TV.
+			Coincidentally, Roku, Vizio, and Tizen are all Android based OS's. The DLNA is all me though
+		</p>
 
 		<div style="height: 300px; width: 100%">
 			<canvas id="totalTopPlatform"></canvas>
@@ -222,6 +237,16 @@
 
 		<div class="container">
 			<h3 style="margin-bottom: 10px;">Total Watch Count by Month and Hour</h3>
+			<p>
+				The graph on the left here shows the most common hour of the day is 8 AM, with 9 PM being a very close second.
+				We have morning show people, and evening show people.
+				My initial thought would be a quick pick up, starting around 7 am, a steady rise until midnight, and a sharp decline into the wee hours of the morning.
+			</p>
+			<p>
+				The graph on the right shows the usage compared by month.
+				The Summer is clearly the time where more people are doing stuff outside, but I also had the server down for about a week while I was moving, so that probably tainted the results a little.
+				And to no ones surprise, December is when everyone is watching Christmas movies and relaxing inside staying cozy and warm.
+			</p>
 			<div class="row">
 				<div class="col-6">
 					<canvas id="totalHourlyWatchCount" style="width:100%;max-width:700px"></canvas>
@@ -235,7 +260,7 @@
 
 	<hr class="col-1 my-4">
 
-	<div class="col-lg-8 px-0" style="margin-bottom: 40px">
+	<div class="col-lg-10 px-0" style="margin-bottom: 40px">
 		<h2 id="user-stats">{% user_name %}'s Statistics</h2>
 		<p>
 			This section is just for you. These statistics represent your personal data, and your data alone.
@@ -355,6 +380,18 @@
 		</tr>
 		</tbody>
 	</table>
+
+		<div class="container">
+			<h3 style="margin-bottom: 10px;">{% user_name %}'s Watch Count by Month and Hour</h3>
+			<div class="row">
+				<div class="col-6">
+					<canvas id="userHourlyWatchCount" style="width:100%;max-width:700px"></canvas>
+				</div>
+				<div class="col-6">
+					<canvas id="userMonthlyWatchCount" style="width:100%;max-width:700px"></canvas>
+				</div>
+			</div>
+		</div>
 </div>
 	<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 	<script>
@@ -376,6 +413,7 @@
 			}
 		});
 
+		/* ------------------------------------------------------------ */
 		new Chart("totalBandwidthUsed", {
 			type: "pie",
 			data: {
@@ -393,6 +431,7 @@
 			}
 		});
 
+		/* ------------------------------------------------------------ */
 		new Chart("userBandwidthUsed", {
 			type: "pie",
 			data: {
@@ -410,6 +449,7 @@
 			}
 		});
 
+		/* ------------------------------------------------------------ */
 		new Chart("totalWatchTime", {
 			type: "pie",
 			data: {
@@ -427,6 +467,7 @@
 			}
 		});
 
+		/* ------------------------------------------------------------ */
 		new Chart("userWatchTime", {
 			type: "pie",
 			data: {
@@ -444,7 +485,7 @@
 			}
 		});
 
-
+		/* ------------------------------------------------------------ */
 		let totalPlatformData = {
 			labels: [
 				"{% total_top_platform_count_1_name %}",
@@ -518,95 +559,91 @@
 			data: totalPlatformData,
 			options: totalPlatformOptions
 		})
+
+		/* ------------------------------------------------------------ */
 		let totalHourlyWatchCountData = {
-					labels: [
-						"{% total_hour_00_watch_label %}",
-						"{% total_hour_01_watch_label %}",
-						"{% total_hour_02_watch_label %}",
-						"{% total_hour_03_watch_label %}",
-						"{% total_hour_04_watch_label %}",
-						"{% total_hour_05_watch_label %}",
-						"{% total_hour_06_watch_label %}",
-						"{% total_hour_07_watch_label %}",
-						"{% total_hour_08_watch_label %}",
-						"{% total_hour_09_watch_label %}",
-						"{% total_hour_10_watch_label %}",
-						"{% total_hour_11_watch_label %}",
-						"{% total_hour_12_watch_label %}",
-						"{% total_hour_13_watch_label %}",
-						"{% total_hour_14_watch_label %}",
-						"{% total_hour_15_watch_label %}",
-						"{% total_hour_16_watch_label %}",
-						"{% total_hour_17_watch_label %}",
-						"{% total_hour_18_watch_label %}",
-						"{% total_hour_19_watch_label %}",
-						"{% total_hour_20_watch_label %}",
-						"{% total_hour_21_watch_label %}",
-						"{% total_hour_22_watch_label %}",
-						"{% total_hour_23_watch_label %}"
-					],
-					datasets: [{
-						label: 'Total Usage Count by Platform',
-						backgroundColor: [
-							'#EA8B31',
-							'#E1ABB9',
-							'#92D9CF',
-							'#43303C',
-							'#F194AF',
-							'#A6CF35',
-							'#DF7197',
-							'#330871',
-							'#064266',
-							'#6E2CD1',
-							'#67E079',
-							'#97ABBB',
-							'#655C43',
-							'#69AEF6',
-							'#FA587A',
-							'#5958D2',
-							'#0BEC96',
-							'#52852E',
-							'#8FADE9',
-							'#89312B',
-							'#C69E1A',
-							'#89F839',
-							'#2591B2',
-							'#746BB8',
-						],
-						data: [
-							{% total_hour_00_watch_count %},
-							{% total_hour_01_watch_count %},
-							{% total_hour_02_watch_count %},
-							{% total_hour_03_watch_count %},
-							{% total_hour_04_watch_count %},
-							{% total_hour_05_watch_count %},
-							{% total_hour_06_watch_count %},
-							{% total_hour_07_watch_count %},
-							{% total_hour_08_watch_count %},
-							{% total_hour_09_watch_count %},
-							{% total_hour_10_watch_count %},
-							{% total_hour_11_watch_count %},
-							{% total_hour_12_watch_count %},
-							{% total_hour_13_watch_count %},
-							{% total_hour_14_watch_count %},
-							{% total_hour_15_watch_count %},
-							{% total_hour_16_watch_count %},
-							{% total_hour_17_watch_count %},
-							{% total_hour_18_watch_count %},
-							{% total_hour_19_watch_count %},
-							{% total_hour_20_watch_count %},
-							{% total_hour_21_watch_count %},
-							{% total_hour_22_watch_count %},
-							{% total_hour_23_watch_count %}
-						]
-					}]
+			labels: [
+				"{% total_hour_00_watch_label %}",
+				"{% total_hour_01_watch_label %}",
+				"{% total_hour_02_watch_label %}",
+				"{% total_hour_03_watch_label %}",
+				"{% total_hour_04_watch_label %}",
+				"{% total_hour_05_watch_label %}",
+				"{% total_hour_06_watch_label %}",
+				"{% total_hour_07_watch_label %}",
+				"{% total_hour_08_watch_label %}",
+				"{% total_hour_09_watch_label %}",
+				"{% total_hour_10_watch_label %}",
+				"{% total_hour_11_watch_label %}",
+				"{% total_hour_12_watch_label %}",
+				"{% total_hour_13_watch_label %}",
+				"{% total_hour_14_watch_label %}",
+				"{% total_hour_15_watch_label %}",
+				"{% total_hour_16_watch_label %}",
+				"{% total_hour_17_watch_label %}",
+				"{% total_hour_18_watch_label %}",
+				"{% total_hour_19_watch_label %}",
+				"{% total_hour_20_watch_label %}",
+				"{% total_hour_21_watch_label %}",
+				"{% total_hour_22_watch_label %}",
+				"{% total_hour_23_watch_label %}"
+			],
+			datasets: [{
+				label: 'Total Usage Count by Platform',
+				backgroundColor: [
+					'#EA8B31',
+					'#E1ABB9',
+					'#92D9CF',
+					'#43303C',
+					'#F194AF',
+					'#A6CF35',
+					'#DF7197',
+					'#330871',
+					'#064266',
+					'#6E2CD1',
+					'#67E079',
+					'#97ABBB',
+					'#655C43',
+					'#69AEF6',
+					'#FA587A',
+					'#5958D2',
+					'#0BEC96',
+					'#52852E',
+					'#8FADE9',
+					'#89312B',
+					'#C69E1A',
+					'#89F839',
+					'#2591B2',
+					'#746BB8',
+				],
+				data: [
+					{% total_hour_00_watch_count %},
+					{% total_hour_01_watch_count %},
+					{% total_hour_02_watch_count %},
+					{% total_hour_03_watch_count %},
+					{% total_hour_04_watch_count %},
+					{% total_hour_05_watch_count %},
+					{% total_hour_06_watch_count %},
+					{% total_hour_07_watch_count %},
+					{% total_hour_08_watch_count %},
+					{% total_hour_09_watch_count %},
+					{% total_hour_10_watch_count %},
+					{% total_hour_11_watch_count %},
+					{% total_hour_12_watch_count %},
+					{% total_hour_13_watch_count %},
+					{% total_hour_14_watch_count %},
+					{% total_hour_15_watch_count %},
+					{% total_hour_16_watch_count %},
+					{% total_hour_17_watch_count %},
+					{% total_hour_18_watch_count %},
+					{% total_hour_19_watch_count %},
+					{% total_hour_20_watch_count %},
+					{% total_hour_21_watch_count %},
+					{% total_hour_22_watch_count %},
+					{% total_hour_23_watch_count %}
+				]
+			}]
 		}
-		
-		new Chart("totalHourlyWatchCount", {
-			type: 'bar',
-			data: totalHourlyWatchCountData,
-			options: totalHourlyWatchCountOptions
-		})
 
 		let totalHourlyWatchCountOptions = {
 			title: {
@@ -620,6 +657,14 @@
 			responsive: true,
 			maintainAspectRatio: false
 		}
+		
+		new Chart("totalHourlyWatchCount", {
+			type: 'bar',
+			data: totalHourlyWatchCountData,
+			options: totalHourlyWatchCountOptions
+		})
+
+		/* ------------------------------------------------------------ */
 		let totalMonthlyWatchCountData = {
 			labels: [
 				'January',
@@ -676,6 +721,169 @@
 			type: 'polarArea',
 			data: totalMonthlyWatchCountData,
 			options: totalMonthlyWatchCountOptions
+		})
+
+		/* ------------------------------------------------------------ */
+		let userHourlyWatchCountData = {
+			labels: [
+				"{% total_hour_00_watch_label %}",
+				"{% total_hour_01_watch_label %}",
+				"{% total_hour_02_watch_label %}",
+				"{% total_hour_03_watch_label %}",
+				"{% total_hour_04_watch_label %}",
+				"{% total_hour_05_watch_label %}",
+				"{% total_hour_06_watch_label %}",
+				"{% total_hour_07_watch_label %}",
+				"{% total_hour_08_watch_label %}",
+				"{% total_hour_09_watch_label %}",
+				"{% total_hour_10_watch_label %}",
+				"{% total_hour_11_watch_label %}",
+				"{% total_hour_12_watch_label %}",
+				"{% total_hour_13_watch_label %}",
+				"{% total_hour_14_watch_label %}",
+				"{% total_hour_15_watch_label %}",
+				"{% total_hour_16_watch_label %}",
+				"{% total_hour_17_watch_label %}",
+				"{% total_hour_18_watch_label %}",
+				"{% total_hour_19_watch_label %}",
+				"{% total_hour_20_watch_label %}",
+				"{% total_hour_21_watch_label %}",
+				"{% total_hour_22_watch_label %}",
+				"{% total_hour_23_watch_label %}"
+			],
+			datasets: [{
+				label: 'Total Usage Count by Platform',
+				backgroundColor: [
+					'#EA8B31',
+					'#E1ABB9',
+					'#92D9CF',
+					'#43303C',
+					'#F194AF',
+					'#A6CF35',
+					'#DF7197',
+					'#330871',
+					'#064266',
+					'#6E2CD1',
+					'#67E079',
+					'#97ABBB',
+					'#655C43',
+					'#69AEF6',
+					'#FA587A',
+					'#5958D2',
+					'#0BEC96',
+					'#52852E',
+					'#8FADE9',
+					'#89312B',
+					'#C69E1A',
+					'#89F839',
+					'#2591B2',
+					'#746BB8',
+				],
+				data: [
+					{% user_hour_00_watch_count %},
+					{% user_hour_01_watch_count %},
+					{% user_hour_02_watch_count %},
+					{% user_hour_03_watch_count %},
+					{% user_hour_04_watch_count %},
+					{% user_hour_05_watch_count %},
+					{% user_hour_06_watch_count %},
+					{% user_hour_07_watch_count %},
+					{% user_hour_08_watch_count %},
+					{% user_hour_09_watch_count %},
+					{% user_hour_10_watch_count %},
+					{% user_hour_11_watch_count %},
+					{% user_hour_12_watch_count %},
+					{% user_hour_13_watch_count %},
+					{% user_hour_14_watch_count %},
+					{% user_hour_15_watch_count %},
+					{% user_hour_16_watch_count %},
+					{% user_hour_17_watch_count %},
+					{% user_hour_18_watch_count %},
+					{% user_hour_19_watch_count %},
+					{% user_hour_20_watch_count %},
+					{% user_hour_21_watch_count %},
+					{% user_hour_22_watch_count %},
+					{% user_hour_23_watch_count %}
+				]
+			}]
+		}
+
+		let userHourlyWatchCountOptions = {
+			title: {
+				text: "Usage Count by Hour of the Day"
+			},
+			scales: {
+				y: {
+					beginAtZero: true
+				}
+			},
+			responsive: true,
+			maintainAspectRatio: false
+		}
+
+		new Chart("userHourlyWatchCount", {
+			type: 'bar',
+			data: userHourlyWatchCountData,
+			options: userHourlyWatchCountOptions
+		})
+
+		/* ------------------------------------------------------------ */
+		let userMonthlyWatchCountData = {
+			labels: [
+				'January',
+				'February',
+				'March',
+				'April',
+				'May',
+				'June',
+				'July',
+				'August',
+				'September',
+				'October',
+				'November',
+				'December'
+			],
+			datasets: [{
+				label: 'Watch Count by Month',
+				backgroundColor: [
+					'rgb(75, 192, 192)',
+					'rgb(201, 203, 207)',
+					'rgb(255, 159, 64)',
+					'rgb(129, 227, 38)',
+					'rgb(153, 102, 255)',
+					'rgb(255, 205, 86)',
+					'rgb(54, 162, 235)',
+					'rgb(35, 40, 126)',
+					'rgb(151, 75, 27)',
+					'rgb(174, 159, 205)',
+					'rgb(255, 99, 132)',
+					'rgb(33, 96, 28)',
+				],
+				data: [
+					{% user_January_watch_count %},
+					{% user_February_watch_count %},
+					{% user_March_watch_count %},
+					{% user_April_watch_count %},
+					{% user_May_watch_count %},
+					{% user_June_watch_count %},
+					{% user_July_watch_count %},
+					{% user_August_watch_count %},
+					{% user_September_watch_count %},
+					{% user_October_watch_count %},
+					{% user_November_watch_count %},
+					{% user_December_watch_count %}
+				]
+			}]
+		}
+
+		let userMonthlyWatchCountOptions = {
+
+		}
+
+		new Chart("userMonthlyWatchCount", {
+			type: 'polarArea',
+			data: userMonthlyWatchCountData,
+			options: userMonthlyWatchCountOptions
 		})
 	</script>
 </body>
